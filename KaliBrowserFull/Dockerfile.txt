@@ -1,0 +1,45 @@
+FROM kalilinux/kali-linux-docker
+MAINTAINER Light Ning <lightning1141@gmail.com>
+
+
+
+# Set correct environment variables
+ENV HOME /root/
+ENV DEBIAN_FRONTEND noninteractive
+ENV LC_ALL C.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+RUN apt-get update && \
+    apt-get install -y \
+    	kali-linux-full \
+        ca-certificates \
+        git \
+        xvfb \
+        x11vnc \
+        xdotool \
+        wget \
+        python \
+        python-numpy \
+        unzip \
+        firefox \
+        openbox \
+        menu \
+        supervisor \
+        x11-apps \
+        net-tools \
+        lightdm 
+     	
+
+ENV DISPLAY :0.0
+
+
+RUN git clone https://github.com/kanaka/noVNC.git
+RUN cd noVNC/utils/ && git clone https://github.com/kanaka/websockify websockify
+
+ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expose Port
+EXPOSE 6080
+
+CMD ["/usr/bin/supervisord"]
