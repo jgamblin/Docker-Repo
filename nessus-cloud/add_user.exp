@@ -1,0 +1,19 @@
+spawn /opt/nessus/sbin/nessuscli adduser admin
+
+expect "Login password:"
+send "admin\r"
+expect "Login password (again):"
+send "admin\r"
+
+expect "user to be a Nessus 'system administrator'"
+send "y\r"
+
+expect "Enter the rules for this user"
+send "\r"
+
+expect "Is that ok?"
+send "y\r"
+
+expect "An error occurred" {exit 1}
+
+wait
