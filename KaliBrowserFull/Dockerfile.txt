@@ -1,7 +1,5 @@
-FROM kalilinux/kali-linux-docker
-MAINTAINER Light Ning <lightning1141@gmail.com>
-
-
+FROM kalilinux/kali-rolling:latest
+LABEL maintainer="Light Ning <lightning1141@gmail.com>"
 
 # Set correct environment variables
 ENV HOME /root/
@@ -11,7 +9,7 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     	kali-linux-full \
         ca-certificates \
         git \
@@ -28,16 +26,30 @@ RUN apt-get update && \
         supervisor \
         x11-apps \
         net-tools \
-        lightdm 
-     	
+        lightdm \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV DISPLAY :0.0
 
-
+WORKDIR /root
 RUN git clone https://github.com/kanaka/noVNC.git
-RUN cd noVNC/utils/ && git clone https://github.com/kanaka/websockify websockify
 
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+WORKDIR /root/noVNC/utils
+RUN git clone https://github.com/kanaka/websockify websockify
+
+WORKDIR /root
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create non-root user
+RUN useradd -m -u 1000 kaliuser && \
+    chown -R kaliuser:kaliuser /root
+USER kaliuser
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:6080/ || exit 1
 
 # Expose Port
 EXPOSE 6080

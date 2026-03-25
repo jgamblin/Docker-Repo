@@ -8,7 +8,7 @@ ENV NESSUS_KEY="Get from https://cloud.tenable.com/app.html#/scans/scanners"
 #Update The Container
 RUN set -x
 RUN yum -y update nss-util bind-license libssh2 && yum clean all && rm -fr /var/cache/yum
-RUN yum -y install expect
+RUN yum -y install expect && yum clean all && rm -rf /var/cache/yum
 
 # Import Tanable's GPG key
 RUN rpm --import https://static.tenable.com/marketing/RPM-GPG-KEY-Tenable
@@ -31,6 +31,14 @@ RUN expect /add_user.exp
 
 # Set HOSTNAME and Register
 RUN /opt/nessus/sbin/nessuscli managed link --key=${NESSUS_KEY} --name=${NESSUS_NAME} --cloud
+
+# Create non-root user (Note: Nessus typically requires root, but creating user for best practice)
+RUN useradd -m -u 1000 nessususer
+USER nessususer
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -k -f https://localhost:8834/ || exit 1
 
 EXPOSE 8834
 CMD ["/opt/nessus/sbin/nessus-service"]

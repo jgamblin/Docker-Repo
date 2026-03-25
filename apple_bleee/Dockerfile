@@ -4,7 +4,7 @@ RUN apt-get update && \
     apt-get upgrade -y
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     bluetooth \
     bluez \
     cmake \
@@ -29,16 +29,32 @@ RUN apt-get update && \
     python3-pip \
     wget \
     wireless-tools  \
-    zlib1g-dev
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/hexway/apple_bleee.git && \
-    cd apple_bleee && \
-    pip3 install -r requirements.txt && \
-    git clone https://github.com/seemoo-lab/owl.git && \
-    cd ./owl && \
-    git submodule update --init && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
+WORKDIR /root
+RUN git clone https://github.com/hexway/apple_bleee.git
+
+WORKDIR /root/apple_bleee
+RUN pip3 install -r requirements.txt && \
+    git clone https://github.com/seemoo-lab/owl.git
+
+WORKDIR /root/apple_bleee/owl
+RUN git submodule update --init && \
+    mkdir build
+
+WORKDIR /root/apple_bleee/owl/build
+RUN cmake .. && \
     make && \
     make install
+
+WORKDIR /root/apple_bleee
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /root/apple_bleee
+USER appuser
+
+# Add healthcheck (checking if the directory is accessible)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD test -d /root/apple_bleee || exit 1
