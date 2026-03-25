@@ -1,45 +1,43 @@
+# syntax=docker/dockerfile:1
 FROM centos:7
 
 # Set shell options for safety
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-#Set The Variables
+# Set build-time variables
 ENV NESSUS_VERSION="7.0.3"
 ENV NESSUS_NAME="Nessus_Docker_Container"
-ARG NESSUS_KEY
-ENV NESSUS_KEY_FILE="/run/secrets/nessus_key"
 
-#Update The Container
+# Update and install dependencies
+# hadolint ignore=DL3033
 RUN set -x && \
     yum -y update nss-util bind-license libssh2 && \
     yum -y install expect && \
     yum clean all && \
     rm -rf /var/cache/yum
 
-# Import Tanable's GPG key
+# Import Tenable's GPG key
 RUN rpm --import https://static.tenable.com/marketing/RPM-GPG-KEY-Tenable
 
+# Download Nessus
 RUN DOWNLOAD_ID=$(curl -ssl -o - "https://www.tenable.com/downloads/nessus" | sed -n -e 's/.*data-download-id="\([0-9]*\)".*data-file-name="\([a-zA-Z0-9_\.-]\+\-es7\.x86_64\.rpm\).*".*/\1/p') && \
-    curl -ssL -o "/tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm" "https://tenable-downloads-production.s3.amazonaws.com/uploads/download/file/${DOWNLOAD_ID}/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm"
-
-RUN (yum -y localinstall /tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm || \
-    yum -y localinstall /tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm) && \
-    yum clean all
-
-# Cleanup
-RUN rm "/tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm" && \
+    curl -ssL -o "/tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm" "https://tenable-downloads-production.s3.amazonaws.com/uploads/download/file/${DOWNLOAD_ID}/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm" && \
+    (yum -y localinstall "/tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm" || \
+    yum -y localinstall "/tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm") && \
     yum clean all && \
+    rm "/tmp/Nessus-${NESSUS_VERSION}-es7.x86_64.rpm" && \
     rm -rf /var/cache/yum && \
     rm -rf /opt/nessus/var/nessus/uuid /opt/nessus/var/nessus/*.db* /opt/nessus/var/nessus/master.key
 
-# Add NESSUS_USER
+# Add NESSUS_USER and register with Tenable Cloud
+# Uses BuildKit secret mount to avoid exposing NESSUS_KEY in image layers
 COPY add_user.exp /
 RUN expect /add_user.exp
+RUN --mount=type=secret,id=nessus_key \
+    NESSUS_KEY=$(cat /run/secrets/nessus_key) && \
+    /opt/nessus/sbin/nessuscli managed link --key="${NESSUS_KEY}" --name="${NESSUS_NAME}" --cloud
 
-# Set HOSTNAME and Register
-RUN /opt/nessus/sbin/nessuscli managed link --key=${NESSUS_KEY} --name=${NESSUS_NAME} --cloud
-
-# Create non-root user (Note: Nessus typically requires root, but creating user for best practice)
+# Create non-root user
 RUN useradd -m -u 1000 nessususer
 USER nessususer
 
