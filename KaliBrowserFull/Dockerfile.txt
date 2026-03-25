@@ -1,4 +1,4 @@
-FROM kalilinux/kali-rolling:latest
+FROM kalilinux/kali-rolling:2024.1
 LABEL maintainer="Light Ning <lightning1141@gmail.com>"
 
 # Set correct environment variables

@@ -1,9 +1,7 @@
 FROM ubuntu:18.04
 
 RUN apt-get update && \
-    apt-get upgrade -y
-
-RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     bluetooth \
     bluez \
@@ -36,7 +34,7 @@ WORKDIR /root
 RUN git clone https://github.com/hexway/apple_bleee.git
 
 WORKDIR /root/apple_bleee
-RUN pip3 install -r requirements.txt && \
+RUN pip3 install --no-cache-dir -r requirements.txt && \
     git clone https://github.com/seemoo-lab/owl.git
 
 WORKDIR /root/apple_bleee/owl
