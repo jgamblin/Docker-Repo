@@ -1,5 +1,6 @@
 FROM alpine:3.21
 
+# hadolint ignore=DL3018
 RUN echo '@testing http://nl.alpinelinux.org/alpine/edge/testing' \
     >> /etc/apk/repositories && \
     apk --update --no-cache add tor@testing runit@testing
@@ -16,4 +17,4 @@ USER toruser
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
     CMD pgrep tor || exit 1
 
-CMD runsvdir /etc/service
+CMD ["runsvdir", "/etc/service"]
