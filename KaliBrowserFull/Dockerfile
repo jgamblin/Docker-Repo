@@ -1,5 +1,4 @@
 # checkov:skip=CKV_DOCKER_7:Kali Rolling is a rolling release with no fixed tags
-# trivy:ignore:AVD-DS-0001
 # hadolint ignore=DL3006
 FROM kalilinux/kali-rolling
 
