@@ -35,7 +35,7 @@ DOCKER_BUILDKIT=1 docker build \
 docker run -d --name nessus-cloud -p 8834:8834 nessus-cloud
 ```
 
-Access the web interface at https://127.0.0.1:8834
+Access the web interface at <https://127.0.0.1:8834>
 
 The scanner will appear as a linked scanner in your Tenable Cloud dashboard.
 

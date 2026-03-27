@@ -1,6 +1,6 @@
-# hadolint ignore=DL3006
-# trivy:ignore:AVD-DS-0001
 # checkov:skip=CKV_DOCKER_7:Kali Rolling is a rolling release with no fixed tags
+# trivy:ignore:AVD-DS-0001
+# hadolint ignore=DL3006
 FROM kalilinux/kali-rolling
 
 LABEL org.opencontainers.image.source="https://github.com/jgamblin/Docker-Repo"
