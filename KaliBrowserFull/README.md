@@ -16,15 +16,15 @@ Note: This image installs `kali-linux-default`, which is a large download (~5GB+
 docker run -d --name kali-browser -p 6080:6080 kali-browser
 ```
 
-Open http://localhost:6080 in your browser to access the Kali desktop.
+Open <http://localhost:6080> in your browser to access the Kali desktop.
 
 ## Configuration
 
-| Setting | Default | Notes |
-|---------|---------|-------|
+| Setting            | Default  | Notes                                             |
+| ------------------ | -------- | ------------------------------------------------- |
 | Display resolution | 1024x768 | Change in `supervisord.conf` (Xvfb `-screen` arg) |
-| Web port | 6080 | noVNC web interface |
-| VNC port | 5900 | Internal only (not exposed by default) |
+| Web port           | 6080     | noVNC web interface                               |
+| VNC port           | 5900     | Internal only (not exposed by default)            |
 
 To change the resolution, mount a custom supervisord config:
 

@@ -11,6 +11,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG NESSUS_VERSION="10.8.3"
 ENV NESSUS_NAME="Nessus_Docker_Container"
 
+# hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates \

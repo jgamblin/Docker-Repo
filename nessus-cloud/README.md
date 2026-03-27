@@ -41,12 +41,12 @@ The scanner will appear as a linked scanner in your Tenable Cloud dashboard.
 
 ## Configuration
 
-| Setting | Default | Notes |
-|---------|---------|-------|
-| Admin user | `admin` | Change in `add_user.exp` before build |
-| Admin password | `admin` | Change in `add_user.exp` before build |
-| Web port | 8834 | Standard Nessus port |
-| Scanner name | `Nessus_Docker_Container` | Set via `NESSUS_NAME` env var |
+| Setting        | Default                   | Notes                                 |
+| -------------- | ------------------------- | ------------------------------------- |
+| Admin user     | `admin`                   | Change in `add_user.exp` before build |
+| Admin password | `admin`                   | Change in `add_user.exp` before build |
+| Web port       | 8834                      | Standard Nessus port                  |
+| Scanner name   | `Nessus_Docker_Container` | Set via `NESSUS_NAME` env var         |
 
 ## Security Notes
 

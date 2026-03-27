@@ -1,3 +1,6 @@
+# hadolint ignore=DL3006
+# trivy:ignore:AVD-DS-0001
+# checkov:skip=CKV_DOCKER_7:Kali Rolling is a rolling release with no fixed tags
 FROM kalilinux/kali-rolling
 
 LABEL org.opencontainers.image.source="https://github.com/jgamblin/Docker-Repo"
@@ -12,6 +15,7 @@ ENV HOME=/root \
     LANGUAGE=en_US.UTF-8 \
     DISPLAY=:0.0
 
+# hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         kali-linux-default \
